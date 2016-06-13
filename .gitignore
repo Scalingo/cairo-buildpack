@@ -1,6 +1,3 @@
 src/
 dist/
-cedar-stack/
-cedar-14-stack/
-cairo-cedar/
-cairo-cedar-14/
+cairo-scalingo/
