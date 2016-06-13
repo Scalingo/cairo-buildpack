@@ -7,6 +7,10 @@ set -e # fail fast
 BUILD_DIR=$1
 CACHE_DIR=$2
 BUILDPACK_NAME=cairo
+BP_DIR=$(cd $(dirname ${0:-}); cd ..; pwd)
+
+. "$BP_DIR/config/versions.sh"
+. "$BP_DIR/config/s3.sh"
 
 function indent() {
   c='s/^/       /'
@@ -22,7 +26,7 @@ function vendor() {
 
   echo "Fetching $binary" | indent
   mkdir -p $path
-  curl $binary -s -o - | tar xz -C $path -f -
+  curl $binary --retry 3 --connect-timeout 20 -s -o - | tar xz -C $path -f -
 
   if [ -d "$path/bin" ]; then
     export PATH=$path/bin:$PATH
@@ -41,31 +45,35 @@ function vendor() {
   export LD_LIBRARY_PATH="$path/lib:$LD_LIBRARY_PATH"
 }
 
+function should_install() {
+  local package="$1"
+  if [ -z "$CAIRO_BUILDPACK_LIBS" ] ; then
+    return 0
+  else
+    echo $CAIRO_BUILDPACK_LIBS | grep -q "$package" ; rc=$?
+    return $rc
+  fi
+}
+
+function tweak_paths() {
+  export CPPPATH="$BUILD_DIR/vendor/$1/include/$2:$CPPPATH"
+  export CPATH="$BUILD_DIR/vendor/$1/include/$2:$CPATH"
+}
+
 echo "-----> Vendoring binaries"
-vendor "https://s3.amazonaws.com/mojodna-heroku/$STACK/cairo-1.14.2-1.tar.gz"  "$BUILD_DIR/vendor/cairo"
-vendor "https://s3.amazonaws.com/mojodna-heroku/$STACK/freetype-2.5.5-1.tar.gz" "$BUILD_DIR/vendor/freetype"
-vendor "https://s3.amazonaws.com/mojodna-heroku/$STACK/giflib-4.2.3-2.tar.gz"   "$BUILD_DIR/vendor/giflib"
-vendor "https://s3.amazonaws.com/mojodna-heroku/$STACK/pixman-0.32.6-2.tar.gz"  "$BUILD_DIR/vendor/pixman"
-
-if [ $STACK == "cedar-14" ]; then
-  vendor "https://s3.amazonaws.com/mojodna-heroku/$STACK/pango-1.36.8-1.tar.gz"  "$BUILD_DIR/vendor/pango"
-  vendor "https://s3.amazonaws.com/mojodna-heroku/$STACK/harfbuzz-0.9.39-1.tar.gz"  "$BUILD_DIR/vendor/harfbuzz"
-  vendor "https://s3.amazonaws.com/mojodna-heroku/$STACK/fontconfig-2.11.93-1.tar.gz"  "$BUILD_DIR/vendor/fontconfig"
-else
-  echo
-  echo "-----> WARNING <-----"
-  echo
-  echo "You are using the cedar-10 stack--node-canvas 1.2.1 cannot build due to" | indent
-  echo "missing dependencies. Please consider updating to the cedar-14 stack:" | indent
-  echo "heroku stack:set cedar-14" | indent
-  echo
-fi
-
-echo "-----> Tweaking Cairo, FreeType, and Pixman include paths"
+should_install "cairo" && vendor "https://s3.amazonaws.com/$S3_BUCKET/$STACK/cairo-$CAIRO_VERSION.tar.gz"  "$BUILD_DIR/vendor/cairo"
+should_install "freetype" && vendor "https://s3.amazonaws.com/$S3_BUCKET/$STACK/freetype-$FREETYPE_VERSION.tar.gz" "$BUILD_DIR/vendor/freetype"
+should_install "giflib" && vendor "https://s3.amazonaws.com/$S3_BUCKET/$STACK/giflib-$GIFLIB_VERSION.tar.gz"   "$BUILD_DIR/vendor/giflib"
+should_install "pixman" && vendor "https://s3.amazonaws.com/$S3_BUCKET/$STACK/pixman-$PIXMAN_VERSION.tar.gz"  "$BUILD_DIR/vendor/pixman"
+should_install "pango" && vendor "https://s3.amazonaws.com/$S3_BUCKET/$STACK/pango-$PANGO_VERSION.tar.gz"  "$BUILD_DIR/vendor/pango"
+should_install "harfbizz" && vendor "https://s3.amazonaws.com/$S3_BUCKET/$STACK/harfbuzz-$HARFBUZZ_VERSION.tar.gz"  "$BUILD_DIR/vendor/harfbuzz"
+should_install "fontconfig" && vendor "https://s3.amazonaws.com/$S3_BUCKET/$STACK/fontconfig-$FONTCONFIG_VERSION.tar.gz"  "$BUILD_DIR/vendor/fontconfig"
 
 # node-canvas isn't using pkg-config, so we need to set non-standard paths
-export CPPPATH="$BUILD_DIR/vendor/cairo/include/cairo:$BUILD_DIR/vendor/pixman/include/pixman-1:$BUILD_DIR/vendor/freetype/include/freetype2:$BUILD_DIR/vendor/pango/include/pango-1.0:$CPPPATH"
-export CPATH="$BUILD_DIR/vendor/cairo/include/cairo:$BUILD_DIR/vendor/pixman/include/pixman-1:$BUILD_DIR/vendor/freetype/include/freetype2:$BUILD_DIR/vendor/pango/include/pango-1.0:$CPATH"
+should_install "cairo" && tweak_paths "cairo" "cairo"
+should_install "pixman" && tweak_paths "pixman" "pixman-1"
+should_install "freetype" && tweak_paths "freetype" "freetype2"
+should_install "pango" && tweak_paths "pango" "pango-1.0"
 
 echo "-----> Configuring build environment"
 

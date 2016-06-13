@@ -1,4 +1,4 @@
-FROM mojodna/cedar-14-stack
+FROM scalingo/builder:v22
 
 ENV DEBIAN_FRONTEND noninteractive
 
@@ -53,16 +53,16 @@ RUN \
 
 RUN \
   cd /app/vendor/pixman && \
-  tar zcf /tmp/pixman-cedar-14.tar.gz . && \
+  tar zcf /tmp/pixman-scalingo.tar.gz . && \
   cd /app/vendor/freetype && \
-  tar zcf /tmp/freetype-cedar-14.tar.gz . && \
+  tar zcf /tmp/freetype-scalingo.tar.gz . && \
   cd /app/vendor/giflib && \
-  tar zcf /tmp/giflib-cedar-14.tar.gz . && \
+  tar zcf /tmp/giflib-scalingo.tar.gz . && \
   cd /app/vendor/fontconfig && \
-  tar zcf /tmp/fontconfig-cedar-14.tar.gz . && \
+  tar zcf /tmp/fontconfig-scalingo.tar.gz . && \
   cd /app/vendor/cairo && \
-  tar zcf /tmp/cairo-cedar-14.tar.gz . && \
+  tar zcf /tmp/cairo-scalingo.tar.gz . && \
   cd /app/vendor/harfbuzz && \
-  tar zcf /tmp/harfbuzz-cedar-14.tar.gz . && \
+  tar zcf /tmp/harfbuzz-scalingo.tar.gz . && \
   cd /app/vendor/pango && \
-  tar zcf /tmp/pango-cedar-14.tar.gz .
+  tar zcf /tmp/pango-scalingo.tar.gz .
