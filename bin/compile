@@ -21,6 +21,10 @@ function indent() {
   esac
 }
 
+function warn() {
+  echo " !     $*"
+}
+
 function vendor() {
   binary="$1"
   path="$2"
@@ -52,6 +56,11 @@ function should_install() {
     return 0
   else
     echo $CAIRO_BUILDPACK_LIBS | grep -q "$package" ; rc=$?
+    if [ $rc -ne 0 ] ; then
+      warn "Package \"$package\" not found"
+    else
+      index "Installing \"$package\""
+    fi
     return $rc
   fi
 }
