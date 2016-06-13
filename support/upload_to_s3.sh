@@ -26,10 +26,16 @@ if [ ! -z "$DEBUG" ] ; then
 fi
 
 $S3CMD sync $DIST_DIR/* s3://$S3_BUCKET/ ; rc=$?
-
 if [ $rc -ne 0 ] ; then
   echo "An error occured while syncing bucket"
   exit 2
 fi
+
+$S3CMD setacl -P --recursive s3://$S3_BUCKET/ ; rc=$?
+if [ $rc -ne 0 ] ; then
+  echo "An error occured while setting acl to public"
+  exit 2
+fi
+
 
 echo "--------> Upload done"
