@@ -2,6 +2,7 @@
 # bin/compile <build-dir> <cache-dir>
 
 set -e # fail fast
+[ $DEBUG = true ] ; set -x
 
 # parse params
 BUILD_DIR=$1
