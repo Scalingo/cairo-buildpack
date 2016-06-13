@@ -69,6 +69,22 @@ make
 
 Artifacts will be dropped in `dist/`.  See `cairo-scalingo/Dockerfile` for build options.
 
+## [Hacking] Uploading to S3
+
+The following variables should be defined:
+
+* `AWS_ACCESS_KEY`
+* `AWS_SECRET_KEY`
+
+The buckets files will get uploaded to is defined in `config/s3.sh`
+
+```bash
+make
+support/upload_to_s3.sh
+```
+
+That's it, result of make has been synced in your S3 bucket.
+
 ## Cairo Configuration
 
 ```
