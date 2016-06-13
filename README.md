@@ -1,68 +1,78 @@
-# heroku-buildpack-cairo
+# Scalingo Cairo Buildpack
 
-I am a Heroku buildpack that installs [Cairo](http://cairographics.org/) and
+This is a buildpack that installs [Cairo](http://cairographics.org/) and
 its dependencies ([Pango](http://www.pango.org/), [Pixman](http://pixman.org/),
 [FreeType](http://www.freetype.org/),
 [HarfBuzz](http://www.freedesktop.org/wiki/Software/HarfBuzz/), and
-[giflib](http://giflib.sourceforge.net/)) into a dyno slug.
+[giflib](http://giflib.sourceforge.net/)) into a container image.
+
+All the libs are installable separately using the `CAIRO_BUILDPACK_LIBS`
+environment variable.
 
 When used with
-[heroku-buildpack-multi](https://github.com/ddollar/heroku-buildpack-multi),
-I enable subsequent buildpacks / steps to link to this library.
+[multi-buildpack](https://github.com/Scalingo/multi-buildpack),
+it enables subsequent buildpacks / steps to any of these libraries.
 
-## Using
-
-### Composed
+## Using this buildpack
 
 You'll almost certainly want to use this in conjunction with one or more
 additional buildpacks.
 
-When creating a new Heroku app:
+When creating a new Scalingo app:
 
 ```bash
-heroku apps:create -b https://github.com/ddollar/heroku-buildpack-multi.git
+scalingo create <appname>
+scalingo env-set BUILDPACK_URL=https://github.com/Scalingo/multi-buildpack.git
 
 cat << EOF > .buildpacks
-https://github.com/mojodna/heroku-buildpack-cairo.git
-https://github.com/heroku/heroku-buildpack-nodejs.git
+https://github.com/Scalingo/cairo-buildpack.git
+https://github.com/Scalingo/nodejs-buildpack.git
 EOF
 
-git push heroku master
+git push scalingo master
 ```
 
-When modifying an existing Heroku app:
+When modifying an existing Scalingo app:
 
 ```bash
-heroku buildpacks:set https://github.com/ddollar/heroku-buildpack-multi.git
+scalingo env-set BUILDPACK_URL=https://github.com/Scalingo/multi-buildpack.git
 
 cat << EOF > .buildpacks
-https://github.com/mojodna/heroku-buildpack-cairo.git
-https://github.com/heroku/heroku-buildpack-nodejs.git
+https://github.com/Scalingo/cairo-buildpack.git
+https://github.com/Scalingo/nodejs-buildpack.git
 EOF
 
-git push heroku master
+git push scalingo master
 ```
 
-## Caveats
+## Configuration
 
-Pango, HarfBuzz, and fontconfig are only available for the `cedar-14` runtime.
-(Pango is required for current versions of node-canvas.)
+Without any particular configuration all the libraries will be installed, but you can specify
+a particular set of libs to install thanks to the `CAIRO_BUILDPACK_LIBS` environment variable.
 
-## Building
+Example:
 
-This uses Docker to build against Heroku
-[stack-image](https://github.com/heroku/stack-images)-like images.
+```
+CAIRO_BUILDPACK_LIBS=libgif
+CAIRO_BUILDPACK_LIBS=libgif,pixman
+CAIRO_BUILDPACK_LIBS=pango,freetype
+```
+
+## [Hacking] Building librairies
+
+It uses Docker and Scalingo builder stack image
+[`scalingo/builder`](https://hub.docker.com/r/scalingo/builder)
 
 ```bash
 make
 ```
 
-Artifacts will be dropped in `dist/`.  See `Dockerfile`s for build options.
+Artifacts will be dropped in `dist/`.  See `cairo-scalingo/Dockerfile` for build options.
 
 ## Cairo Configuration
 
 ```
-cairo (version 1.14.2 [release]) will be compiled with:
+cairo (version 1.14.6 [release]) will be compiled with:
 
 The following surface backends:
   Image:         yes (always builtin)
