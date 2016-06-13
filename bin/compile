@@ -71,19 +71,19 @@ function tweak_paths() {
 }
 
 echo "-----> Vendoring binaries"
-should_install "cairo" && vendor "https://s3.amazonaws.com/$S3_BUCKET/$STACK/cairo-$CAIRO_VERSION.tar.gz"  "$BUILD_DIR/vendor/cairo"
-should_install "freetype" && vendor "https://s3.amazonaws.com/$S3_BUCKET/$STACK/freetype-$FREETYPE_VERSION.tar.gz" "$BUILD_DIR/vendor/freetype"
-should_install "giflib" && vendor "https://s3.amazonaws.com/$S3_BUCKET/$STACK/giflib-$GIFLIB_VERSION.tar.gz"   "$BUILD_DIR/vendor/giflib"
-should_install "pixman" && vendor "https://s3.amazonaws.com/$S3_BUCKET/$STACK/pixman-$PIXMAN_VERSION.tar.gz"  "$BUILD_DIR/vendor/pixman"
-should_install "pango" && vendor "https://s3.amazonaws.com/$S3_BUCKET/$STACK/pango-$PANGO_VERSION.tar.gz"  "$BUILD_DIR/vendor/pango"
-should_install "harfbizz" && vendor "https://s3.amazonaws.com/$S3_BUCKET/$STACK/harfbuzz-$HARFBUZZ_VERSION.tar.gz"  "$BUILD_DIR/vendor/harfbuzz"
-should_install "fontconfig" && vendor "https://s3.amazonaws.com/$S3_BUCKET/$STACK/fontconfig-$FONTCONFIG_VERSION.tar.gz"  "$BUILD_DIR/vendor/fontconfig"
+should_install "cairo"      && vendor "https://$S3_BUCKET.s3.amazonaws.com/$STACK/cairo-$CAIRO_VERSION.tar.gz"           "$BUILD_DIR/vendor/cairo"
+should_install "freetype"   && vendor "https://$S3_BUCKET.s3.amazonaws.com/$STACK/freetype-$FREETYPE_VERSION.tar.gz"     "$BUILD_DIR/vendor/freetype"
+should_install "giflib"     && vendor "https://$S3_BUCKET.s3.amazonaws.com/$STACK/giflib-$GIFLIB_VERSION.tar.gz"         "$BUILD_DIR/vendor/giflib"
+should_install "pixman"     && vendor "https://$S3_BUCKET.s3.amazonaws.com/$STACK/pixman-$PIXMAN_VERSION.tar.gz"         "$BUILD_DIR/vendor/pixman"
+should_install "pango"      && vendor "https://$S3_BUCKET.s3.amazonaws.com/$STACK/pango-$PANGO_VERSION.tar.gz"           "$BUILD_DIR/vendor/pango"
+should_install "harfbizz"   && vendor "https://$S3_BUCKET.s3.amazonaws.com/$STACK/harfbuzz-$HARFBUZZ_VERSION.tar.gz"     "$BUILD_DIR/vendor/harfbuzz"
+should_install "fontconfig" && vendor "https://$S3_BUCKET.s3.amazonaws.com/$STACK/fontconfig-$FONTCONFIG_VERSION.tar.gz" "$BUILD_DIR/vendor/fontconfig"
 
 # node-canvas isn't using pkg-config, so we need to set non-standard paths
-should_install "cairo" && tweak_paths "cairo" "cairo"
-should_install "pixman" && tweak_paths "pixman" "pixman-1"
+should_install "cairo"    && tweak_paths "cairo"    "cairo"
+should_install "pixman"   && tweak_paths "pixman"   "pixman-1"
 should_install "freetype" && tweak_paths "freetype" "freetype2"
-should_install "pango" && tweak_paths "pango" "pango-1.0"
+should_install "pango"    && tweak_paths "pango"    "pango-1.0"
 
 echo "-----> Configuring build environment"
 
