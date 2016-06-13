@@ -53,8 +53,8 @@ a particular set of libs to install thanks to the `CAIRO_BUILDPACK_LIBS` environ
 Example:
 
 ```
-CAIRO_BUILDPACK_LIBS=libgif
-CAIRO_BUILDPACK_LIBS=libgif,pixman
+CAIRO_BUILDPACK_LIBS=giflib
+CAIRO_BUILDPACK_LIBS=giflib,pixman
 CAIRO_BUILDPACK_LIBS=pango,freetype
 ```
 
