@@ -18,21 +18,14 @@ it enables subsequent buildpacks / steps to any of these libraries.
 You'll almost certainly want to use this in conjunction with one or more
 additional buildpacks.
 
-When creating a new Scalingo app:
+If you haven't created your scalingo application:
 
 ```bash
 scalingo create <appname>
-scalingo env-set BUILDPACK_URL=https://github.com/Scalingo/multi-buildpack.git
-
-cat << EOF > .buildpacks
-https://github.com/Scalingo/cairo-buildpack.git
-https://github.com/Scalingo/nodejs-buildpack.git
-EOF
-
-git push scalingo master
 ```
-
-When modifying an existing Scalingo app:
+Then you need to configure your app to use the cairo-buildpack. In the following
+example, we're using the cairo-buildpack and the nodejs buildpack to deploy a node
+or a Meteor app, it may change if you're using a different technology.
 
 ```bash
 scalingo env-set BUILDPACK_URL=https://github.com/Scalingo/multi-buildpack.git
@@ -42,6 +35,8 @@ https://github.com/Scalingo/cairo-buildpack.git
 https://github.com/Scalingo/nodejs-buildpack.git
 EOF
 
+git add .buildpacks
+git commit -m "Add multi buidpack configuration"
 git push scalingo master
 ```
 
