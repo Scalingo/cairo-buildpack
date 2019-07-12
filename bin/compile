@@ -4,6 +4,8 @@
 set -e # fail fast
 [ "$DEBUG" = "true" ] && set -x
 
+STACK="scalingo"
+
 # parse params
 BUILD_DIR=$1
 CACHE_DIR=$2
