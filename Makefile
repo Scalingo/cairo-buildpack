@@ -108,11 +108,11 @@ src/giflib.tar.bz2:
 
 src/harfbuzz.tar.bz2:
 	mkdir -p $$(dirname $@)
-	curl -sL http://www.freedesktop.org/software/harfbuzz/release/harfbuzz-1.2.7.tar.bz2 -o $@
+	curl -sL http://www.freedesktop.org/software/harfbuzz/release/harfbuzz-2.6.4.tar.xz -o $@
 
 src/pango.tar.xz:
 	mkdir -p $$(dirname $@)
-	curl -sL http://ftp.gnome.org/pub/GNOME/sources/pango/1.40/pango-1.40.1.tar.xz -o $@
+	curl -sL http://ftp.gnome.org/pub/GNOME/sources/pango/1.44/pango-1.44.7.tar.xz -o $@
 
 src/pixman.tar.gz:
 	mkdir -p $$(dirname $@)
