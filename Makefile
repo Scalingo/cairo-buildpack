@@ -123,11 +123,11 @@ src/pixman.tar.gz:
 
 scalingo-18-stack:
 	@docker pull scalingo/scalingo-18:latest && \
-	docker tag scalingo/scalingo-18:latest $@:latest
+  	  docker tag scalingo/scalingo-18:latest $@:latest
 
 scalingo-14-stack:
 	@docker pull scalingo/scalingo-14:latest && \
-	docker tag scalingo/scalingo-14:latest $@:latest
+  	  docker tag scalingo/scalingo-14:latest $@:latest
 
 .PHONY: cairo-scalingo
 
