@@ -1,7 +1,7 @@
 default: scalingo-14 scalingo-18
 
 scalingo-14: dist/scalingo-14/pixman-0.34.0-1.tar.gz \
-	        dist/scalingo-14/freetype-2.6.3-1.tar.gz \
+	        dist/scalingo-14/freetype-2.9.1-1.tar.gz \
 					dist/scalingo-14/giflib-5.1.4-1.tar.gz \
 					dist/scalingo-14/pango-1.40.1-1.tar.gz \
 					dist/scalingo-14/cairo-1.14.6-1.tar.gz \
@@ -9,7 +9,7 @@ scalingo-14: dist/scalingo-14/pixman-0.34.0-1.tar.gz \
 					dist/scalingo-14/harfbuzz-1.2.7-1.tar.gz
 
 scalingo-18: dist/scalingo-18/pixman-0.34.0-1.tar.gz \
-	        dist/scalingo-18/freetype-2.6.3-1.tar.gz \
+	        dist/scalingo-18/freetype-2.9.1-1.tar.gz \
 					dist/scalingo-18/giflib-5.1.4-1.tar.gz \
 					dist/scalingo-18/pango-1.40.1-1.tar.gz \
 					dist/scalingo-18/cairo-1.14.6-1.tar.gz \
@@ -100,12 +100,11 @@ src/fontconfig.tar.bz2:
 
 src/freetype.tar.bz2:
 	mkdir -p $$(dirname $@)
-	curl -sL http://download.savannah.gnu.org/releases/freetype/freetype-2.6.3.tar.bz2 -o $@
+	curl -sL http://download.savannah.gnu.org/releases/freetype/freetype-2.9.1.tar.bz2 -o $@
 
 src/giflib.tar.bz2:
 	mkdir -p $$(dirname $@)
 	curl -sL "http://downloads.sourceforge.net/project/giflib/giflib-5.1.4.tar.bz2?r=https%3A%2F%2Fsourceforge.net%2Fprojects%2Fgiflib%2Ffiles%2F&ts=1465769547&use_mirror=heanet" -o $@
-	
 
 src/harfbuzz.tar.bz2:
 	mkdir -p $$(dirname $@)

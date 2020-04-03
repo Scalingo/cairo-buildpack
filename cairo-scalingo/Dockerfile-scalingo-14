@@ -28,27 +28,35 @@ RUN \
   make && \
   make install
 
+ENV PKG_CONFIG_PATH $PKG_CONFIG_PATH:/app/vendor/freetype/lib/pkgconfig
+
 RUN \
   cd /tmp/pixman-* && \
   ./configure --prefix=/app/vendor/pixman && \
   make install
+
+ENV PKG_CONFIG_PATH $PKG_CONFIG_PATH:/app/vendor/pixman/lib/pkgconfig
 
 RUN \
   cd /tmp/giflib-* && \
   ./configure --prefix=/app/vendor/giflib && \
   make install-exec install-data
 
-RUN bash
+ENV PKG_CONFIG_PATH $PKG_CONFIG_PATH:/app/vendor/giflib/lib/pkgconfig
 
 RUN \
   cd /tmp/fontconfig-* && \
   ./configure --prefix=/app/vendor/fontconfig && \
   make install
 
+ENV PKG_CONFIG_PATH $PKG_CONFIG_PATH:/app/vendor/fontconfig/lib/pkgconfig
+
 RUN \
   cd /tmp/cairo-* && \
   ./configure --prefix=/app/vendor/cairo && \
   make install
+
+ENV PKG_CONFIG_PATH $PKG_CONFIG_PATH:/app/vendor/cairo/lib/pkgconfig
 
 RUN \
   cd /tmp/pango-* && \
