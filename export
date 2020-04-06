@@ -1,0 +1,6 @@
+declare -x CPATH="/.apt/usr/include:/.apt/usr/include/x86_64-linux-gnu:"
+declare -x CPPPATH="/.apt/usr/include:/.apt/usr/include/x86_64-linux-gnu:"
+declare -x INCLUDE_PATH="/.apt/usr/include:/.apt/usr/include/x86_64-linux-gnu:"
+declare -x LD_LIBRARY_PATH="/.apt/usr/lib/x86_64-linux-gnu:/.apt/usr/lib/i386-linux-gnu:/.apt/usr/lib:"
+declare -x LIBRARY_PATH="/.apt/usr/lib/x86_64-linux-gnu:/.apt/usr/lib/i386-linux-gnu:/.apt/usr/lib:"
+declare -x PKG_CONFIG_PATH="/.apt/usr/lib/x86_64-linux-gnu/pkgconfig:/.apt/usr/lib/i386-linux-gnu/pkgconfig:/.apt/usr/lib/pkgconfig:"
