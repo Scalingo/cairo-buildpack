@@ -1,6 +1,13 @@
 #!/usr/bin/env bash
 # bin/compile <build-dir> <cache-dir>
 
+if [ $STACK != "scalingo-18" ]
+then
+        echo "Executing legacy compile"
+        . "/buildpack/bin/compile-scalingo-14"
+        exit $?
+fi
+
 # fail fast
 set -e
 

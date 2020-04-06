@@ -1,0 +1,109 @@
+#!/usr/bin/env bash
+# bin/compile <build-dir> <cache-dir>
+
+set -e # fail fast
+[ "$DEBUG" = "true" ] && set -x
+
+# parse params
+BUILD_DIR=$1
+CACHE_DIR=$2
+BUILDPACK_NAME=cairo
+BP_DIR=$(cd $(dirname ${0:-}); cd ..; pwd)
+
+. "$BP_DIR/config/versions.sh"
+. "$BP_DIR/config/s3.sh"
+
+function indent() {
+  c='s/^/       /'
+  case $(uname) in
+    Darwin) sed -l "$c";;
+    *)      sed -u "$c";;
+  esac
+}
+
+function warn() {
+  echo " !     $*"
+}
+
+function vendor() {
+  binary="$1"
+  path="$2"
+
+  echo "Fetching $binary" | indent
+  mkdir -p $path
+  curl $binary --retry 3 --connect-timeout 20 -s -o - | tar xz -C $path -f -
+
+  if [ -d "$path/bin" ]; then
+    export PATH=$path/bin:$PATH
+  fi
+
+  if [ -d "$path/lib/pkgconfig" ]; then
+    # pkg-config should handle compiler options (if used)
+    export PKG_CONFIG_PATH="$path/lib/pkgconfig:$PKG_CONFIG_PATH"
+  fi
+
+  # standard paths
+  export CPPPATH="$path/include:$CPPPATH"
+  export CPATH="$path/include:$CPATH"
+  export LIBRARY_PATH="$path/lib:$LIBRARY_PATH"
+
+  export LD_LIBRARY_PATH="$path/lib:$LD_LIBRARY_PATH"
+}
+
+function should_install() {
+  local package="$1"
+  if [ -z "$CAIRO_BUILDPACK_LIBS" ] ; then
+    return 0
+  else
+    echo $CAIRO_BUILDPACK_LIBS | grep -q "$package" ; rc=$?
+    return $rc
+  fi
+}
+
+function tweak_paths() {
+  export CPPPATH="$BUILD_DIR/vendor/$1/include/$2:$CPPPATH"
+  export CPATH="$BUILD_DIR/vendor/$1/include/$2:$CPATH"
+}
+
+echo "-----> Vendoring binaries"
+should_install "cairo"      && vendor "https://$S3_BUCKET.s3.amazonaws.com/$STACK/cairo-$CAIRO_VERSION.tar.gz"           "$BUILD_DIR/vendor/cairo"
+should_install "freetype"   && vendor "https://$S3_BUCKET.s3.amazonaws.com/$STACK/freetype-$FREETYPE_VERSION.tar.gz"     "$BUILD_DIR/vendor/freetype"
+should_install "giflib"     && vendor "https://$S3_BUCKET.s3.amazonaws.com/$STACK/giflib-$GIFLIB_VERSION.tar.gz"         "$BUILD_DIR/vendor/giflib"
+should_install "pixman"     && vendor "https://$S3_BUCKET.s3.amazonaws.com/$STACK/pixman-$PIXMAN_VERSION.tar.gz"         "$BUILD_DIR/vendor/pixman"
+should_install "pango"      && vendor "https://$S3_BUCKET.s3.amazonaws.com/$STACK/pango-$PANGO_VERSION.tar.gz"           "$BUILD_DIR/vendor/pango"
+should_install "harfbizz"   && vendor "https://$S3_BUCKET.s3.amazonaws.com/$STACK/harfbuzz-$HARFBUZZ_VERSION.tar.gz"     "$BUILD_DIR/vendor/harfbuzz"
+should_install "fontconfig" && vendor "https://$S3_BUCKET.s3.amazonaws.com/$STACK/fontconfig-$FONTCONFIG_VERSION.tar.gz" "$BUILD_DIR/vendor/fontconfig"
+
+# node-canvas isn't using pkg-config, so we need to set non-standard paths
+should_install "cairo"    && tweak_paths "cairo"    "cairo"
+should_install "pixman"   && tweak_paths "pixman"   "pixman-1"
+should_install "freetype" && tweak_paths "freetype" "freetype2"
+should_install "pango"    && tweak_paths "pango"    "pango-1.0"
+
+echo "-----> Configuring build environment"
+
+cat <<EOF > export
+export PATH="$PATH:\$PATH"
+export LD_LIBRARY_PATH="\$LD_LIBRARY_PATH:$LD_LIBRARY_PATH"
+export LIBRARY_PATH="\$LIBRARY_PATH:$LIBRARY_PATH"
+export PKG_CONFIG_PATH="\$PKG_CONFIG_PATH:$PKG_CONFIG_PATH"
+export CPPPATH="\$CPPPATH:$CPPPATH"
+export CPATH="\$CPATH:$CPATH"
+EOF
+
+echo "-----> Building runtime environment"
+mkdir -p $BUILD_DIR/.profile.d
+
+cat <<EOF > $BUILD_DIR/.profile.d/$BUILDPACK_NAME.sh
+export PATH="${PATH//$BUILD_DIR//app}:\$PATH"
+export LD_LIBRARY_PATH="\$LD_LIBRARY_PATH:${LD_LIBRARY_PATH//$BUILD_DIR//app}"
+export LIBRARY_PATH="\$LIBRARY_PATH:${LIBRARY_PATH//$BUILD_DIR//app}"
+export PKG_CONFIG_PATH="\$PKG_CONFIG_PATH:${PKG_CONFIG_PATH//$BUILD_DIR//app}"
+export CPPPATH="\$CPPPATH:${CPPPATH//$BUILD_DIR//app}"
+export CPATH="\$CPATH:${CPATH//$BUILD_DIR//app}"
+EOF
+
+echo "NOTE: if you are experiencing problems, they may be resulting from a cached"
+echo "library referencing and older version of Cairo. To bypass this with the nodejs"
+echo "buildpack, set NODE_MODULES_CACHE=false to force node-canvas to be rebuilt"
+echo "against newer versions of the libraries."
