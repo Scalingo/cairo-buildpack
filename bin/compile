@@ -9,8 +9,7 @@ if [ -n "$BUILDPACK_DEBUG" ]; then
     set -x
 fi
 
-legacy_stacks="cedar-14 scalingo scalingo-14"
-if [[ "${legacy_stacks[*]}" =~ "$STACK" ]]; then
+if [[ "scalingo-14" == "$STACK" ]]; then
   echo "Executing legacy compile"
   . "/buildpack/bin/compile-scalingo-14"
   exit $?
@@ -51,7 +50,7 @@ mkdir -p "$APT_STATE_DIR/lists/partial"
 APT_OPTIONS="-o debug::nolocking=true -o dir::cache=$APT_CACHE_DIR -o dir::state=$APT_STATE_DIR"
 
 case "$STACK" in
-  cedar-14 | scalingo | scalingo-14)
+  scalingo-14)
     APT_FLAGS="--force-yes"
     ;;
   heroku-16 | heroku-18 | scalingo-18 | scalingo-[2-9][0-9])
