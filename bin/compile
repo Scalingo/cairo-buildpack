@@ -1,25 +1,26 @@
 #!/usr/bin/env bash
 # bin/compile <build-dir> <cache-dir>
 
-if [ $STACK != "scalingo-18" ]
-then
-        echo "Executing legacy compile"
-        . "/buildpack/bin/compile-scalingo-14"
-        exit $?
-fi
-
 # fail fast
 set -e
 
 # debug
-# set -x
+if [ -n "$BUILDPACK_DEBUG" ]; then
+    set -x
+fi
+
+if [[ "scalingo-14" == "$STACK" ]]; then
+  echo "Executing legacy compile"
+  . "/buildpack/bin/compile-scalingo-14"
+  exit $?
+fi
 
 # parse and derive params
 BUILD_DIR=$1
 CACHE_DIR=$2
 ENV_DIR=$3
 
-LP_DIR=`cd $(dirname $0); cd ..; pwd`
+LP_DIR=$(cd $(dirname $0); cd ..; pwd)
 
 function error() {
   echo " !     $*" >&2
@@ -49,10 +50,10 @@ mkdir -p "$APT_STATE_DIR/lists/partial"
 APT_OPTIONS="-o debug::nolocking=true -o dir::cache=$APT_CACHE_DIR -o dir::state=$APT_STATE_DIR"
 
 case "$STACK" in
-  "cedar-14" | "scalingo" | "scalingo-14")
+  scalingo-14)
     APT_FLAGS="--force-yes"
     ;;
-  "heroku-16" | "heroku-18" | "scalingo-18")
+  heroku-16 | heroku-18 | scalingo-18 | scalingo-[2-9][0-9])
     APT_FLAGS="--allow-downgrades --allow-remove-essential --allow-change-held-packages"
     ;;
   *)
