@@ -1,7 +1,7 @@
 version = "1.0.0"
 owner = "etienne@scalingo.com"
 team = "IST"
-description = "Buildpack with Cairo (and Pixman and FreeType)"
+description = "Buildpack with Cairo and its dependencies ([Pango](http://www.pango.org/), [Pixman](http://pixman.org/), [FreeType](http://www.freetype.org/), [HarfBuzz](http://www.freedesktop.org/wiki/Software/HarfBuzz/), and [giflib](http://giflib.sourceforge.net/))"
 languages = ["shell"]
 destination_server = []
 flags = ["buildpack"]
